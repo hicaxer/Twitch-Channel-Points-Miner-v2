@@ -2,7 +2,7 @@ name: Twitch Points Miner
 
 on:
   schedule:
-    # Запуск каждые 6 часов (чтобы ферма не простаивала)
+    # Запуск каждые 6 часов
     - cron: '0 */6 * * *'
   workflow_dispatch: # Позволяет запускать вручную через кнопку Run workflow
 
@@ -27,5 +27,6 @@ jobs:
 
       - name: Run Miner
         env:
-          TWITCH_TOKEN: ${{ secrets.TWITCH_TOKEN }}
+          TWITCH_TOKEN_1: ${{ secrets.TWITCH_TOKEN_1 }}
+          TWITCH_TOKEN_2: ${{ secrets.TWITCH_TOKEN_2 }}
         run: python start.py
