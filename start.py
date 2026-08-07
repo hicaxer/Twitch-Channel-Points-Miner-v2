@@ -1,9 +1,18 @@
 import os
 import sys
-from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.classes.Entities import Streamer
 
-# Берем токен из секретов GitHub Actions
+# Проверяем разные варианты структуры импортов
+try:
+    from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+    from TwitchChannelPointsMiner.classes.Settings import Streamer
+except ImportError:
+    try:
+        from TwitchChannelPointsMiner import TwitchChannelPointsMiner, Streamer
+    except ImportError:
+        from TwitchChannelPointsMiner.TwitchChannelPointsMiner import TwitchChannelPointsMiner
+        from TwitchChannelPointsMiner.Streamer import Streamer
+
+# Получаем OAuth-токен
 auth_token = os.environ.get("TWITCH_TOKEN", "")
 
 if not auth_token:
@@ -16,7 +25,7 @@ miner = TwitchChannelPointsMiner(
     claim_drops_startup=True
 )
 
-# Установка токена авторизации
+# Передаем токен авторизации
 if hasattr(miner, "twitch") and miner.twitch is not None:
     miner.twitch.auth_token = auth_token
 
@@ -26,7 +35,7 @@ streamers = [
     Streamer("tsunavohka")
 ]
 
-# Запуск фарма
+# Запуск
 miner.mine(
     streamers,
     followers=False,
