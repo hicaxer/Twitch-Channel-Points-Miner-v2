@@ -1,8 +1,6 @@
 import os
 import sys
-import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.Streamer import Streamer
 
 # Берем токен из секретов GitHub Actions
 auth_token = os.environ.get("TWITCH_TOKEN", "")
@@ -21,13 +19,13 @@ miner = TwitchChannelPointsMiner(
 # Авторизация по OAuth-токену
 miner.analytics.auth_token = auth_token
 
-# Список стримеров для фарма
+# Список стримеров указываем простыми строками
 streamers = [
-    Streamer("foxsi_pubg"),
-    Streamer("tsunavohka"),
+    "foxsi_pubg",
+    "tsunavohka",
 ]
 
-# Запуск фарма (followers=False отключает фарм остальных подписок)
+# Запуск фарма
 miner.mine(
     streamers,
     followers=False,
