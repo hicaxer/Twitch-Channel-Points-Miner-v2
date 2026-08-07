@@ -26,7 +26,7 @@ jobs:
       - name: Запуск майнера
         env:
           TWITCH_TOKEN: ${{ secrets.TWITCH_TOKEN_1 }}
-        run: python run.py
+        run: python hicaxe.py
 
   account-2:
     name: "Аккаунт 2"
