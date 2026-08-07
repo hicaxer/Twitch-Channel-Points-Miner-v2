@@ -1,9 +1,19 @@
 import os
 import sys
 
-# Добавляем путь к папке с исходниками, чтобы Python видел все внутренние файлы
-project_root = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, project_root)
+# Добавляем путь к проекту в систему импортов Python
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Попытка импорта сущностей из разных вариантов структуры репозитория
+try:
+    from TwitchChannelPointsMiner import TwitchChannelPointsMiner
+    from TwitchChannelPointsMiner.classes.Entities import Streamer
+except ImportError:
+    try:
+        from TwitchChannelPointsMiner.TwitchChannelPointsMiner import TwitchChannelPointsMiner
+        from TwitchChannelPointsMiner.Streamer import Streamer
+    except ImportError:
+        from TwitchChannelPointsMiner import TwitchChannelPointsMiner, Streamer
 
 # Берем токен из секретов GitHub Actions
 auth_token = os.environ.get("TWITCH_TOKEN", "")
@@ -12,22 +22,13 @@ if not auth_token:
     print("❌ Ошибка: OAuth-токен не передан!")
     sys.exit(1)
 
-# Прямой импорт основного класса
-try:
-    from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-    from TwitchChannelPointsMiner.classes.Entities import Streamer
-except ModuleNotFoundError:
-    # Вариант для структуры, где файлы лежат в корне или подпапке
-    from TwitchChannelPointsMiner.TwitchChannelPointsMiner import TwitchChannelPointsMiner
-    from TwitchChannelPointsMiner.Streamer import Streamer
-
 # Инициализируем майнер
 miner = TwitchChannelPointsMiner(
     username="Bot",
     claim_drops_startup=True
 )
 
-# Подставляем OAuth-токен в объект авторизации Twitch
+# Авторизация по OAuth-токену
 if hasattr(miner, "twitch") and miner.twitch is not None:
     miner.twitch.auth_token = auth_token
 
