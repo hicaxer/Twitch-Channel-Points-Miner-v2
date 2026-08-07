@@ -1,8 +1,8 @@
 import os
 import sys
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.classes.Settings import Priority
-from TwitchChannelPointsMiner.classes.Entities import Streamer
+from TwitchChannelPointsMiner.Settings import Priority
+from TwitchChannelPointsMiner.Streamer import Streamer
 
 # Берем токен из секретов GitHub Actions
 auth_token = os.environ.get("TWITCH_TOKEN", "")
@@ -26,10 +26,10 @@ miner = TwitchChannelPointsMiner(
 # Авторизация по OAuth-токену
 miner.analytics.auth_token = auth_token
 
-# Указываем ТОЛЬКО тех стримеров, которых нужно фармить (1 или 2 канала):
+# Список стримеров для фарма
 streamers = [
     Streamer("foxsi_pubg"),
-    Streamer("tsunavohka"), # Замени на второго стримера или удали эту строчку, если нужен только од
+    Streamer("tsunavohka"),
 ]
 
 # Запуск фарма (followers=False отключает фарм остальных подписок)
