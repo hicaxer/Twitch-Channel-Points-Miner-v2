@@ -15,25 +15,26 @@ if not auth_token:
 miner = TwitchChannelPointsMiner(
     username="", 
     password="",
-    claim_drops_startup=True, # Авто-сбор Drops при старте
+    claim_drops_startup=True,
     priority=[
-        Priority.STREAK,      # Приоритет стрикам просмотра
-        Priority.DROPS,       # Приоритет дропсам
-        Priority.SUBSCRIBED   # Приоритет каналам с сабкой
+        Priority.STREAK,
+        Priority.DROPS,
+        Priority.SUBSCRIBED
     ]
 )
 
-# Подставляем авторизацию по OAuth токену
+# Авторизация по OAuth-токену
 miner.analytics.auth_token = auth_token
 
-# Указываем отслеживаемые каналы
+# Указываем ТОЛЬКО тех стримеров, которых нужно фармить (1 или 2 канала):
 streamers = [
     Streamer("foxsi_pubg"),
+    Streamer("tsunavohka"), # Замени на второго стримера или удали эту строчку, если нужен только од
 ]
 
-# Запуск фарма
+# Запуск фарма (followers=False отключает фарм остальных подписок)
 miner.mine(
     streamers,
-    followers=True, # Автоматически подтягивать все каналы из твоих отслеживаемых на Twitch
+    followers=False,
     git_upgrade=False
 )
