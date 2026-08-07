@@ -1,17 +1,18 @@
 import os
 import sys
+import pickle
 import builtins
 import importlib
 
-# Перехватываем вызов input, чтобы скрипт не вис в ожидании ввода
+# 1. Заглушка консольного ввода для GitHub Actions
 def non_interactive_input(prompt=""):
-    print(f"\n⚠️ Скрипт попытался запросить консольный ввод: '{prompt}'")
-    print("❌ Токен/куки авторизации Twitch недействительны или просрочены. Обновите TWITCH_TOKEN_1 / TWITCH_TOKEN_2 в Secrets.")
+    print(f"\n⚠️ Скрипт попытался запросить ввод: '{prompt}'")
+    print("❌ Не удалось применить auth-token. Обновите значение TWITCH_TOKEN_1 в GitHub Secrets.")
     sys.exit(1)
 
 builtins.input = non_interactive_input
 
-# Динамический поиск классов
+# 2. Динамический импорт классов
 def get_class(class_name):
     for root, dirs, files in os.walk("."):
         for file in files:
@@ -33,32 +34,52 @@ if not TwitchChannelPointsMiner or not Streamer:
     print("❌ Не удалось найти необходимые классы!")
     sys.exit(1)
 
-# Читаем токены из секретов
+# 3. Чтение и подготовка токена
 token1 = os.environ.get("TWITCH_TOKEN_1", "").strip()
 token2 = os.environ.get("TWITCH_TOKEN_2", "").strip()
 
 auth_token = token1 or token2
 
-# Убираем префикс oauth:, если он случайно записан (в cookies нужен чистый 30-значный хэш)
 if auth_token.startswith("oauth:"):
     auth_token = auth_token.replace("oauth:", "")
 
 if not auth_token:
-    print("❌ Ошибка: Ни один OAuth-токен не передан!")
+    print("❌ Ошибка: Токен TWITCH_TOKEN_1 / TWITCH_TOKEN_2 не передан!")
     sys.exit(1)
 
-# Инициализация майнера
+# 4. Создаем структуру cookies напрямую для обхода интерактивного входа
+username = "Bot"
+cookies_data = {
+    "auth-token": auth_token
+}
+
+# Сохраняем куки во возможные локации, где майнер ищет профиль
+os.makedirs("analytics", exist_ok=True)
+os.makedirs(f"analytics/{username}", exist_ok=True)
+
+cookie_paths = [
+    "cookies.pkl",
+    f"analytics/{username}/cookies.pkl",
+    f"analytics/cookies.pkl"
+]
+
+for path in cookie_paths:
+    try:
+        with open(path, "wb") as f:
+            pickle.dump(cookies_data, f)
+    except Exception:
+        pass
+
+# 5. Инициализация майнера
 miner = TwitchChannelPointsMiner(
-    username="Bot",
+    username=username,
     claim_drops_startup=True
 )
 
-# Принудительно внедряем auth-token в HTTP-сессию майнера
+# 6. Внедрение токена в сессию
 if hasattr(miner, "twitch"):
     if hasattr(miner.twitch, "session"):
         miner.twitch.session.cookies.set("auth-token", auth_token, domain=".twitch.tv")
-    if hasattr(miner.twitch, "auth_token"):
-        miner.twitch.auth_token = auth_token
 
 # Список стримеров
 streamers = [
