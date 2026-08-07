@@ -2,7 +2,7 @@ import os
 import sys
 import importlib
 
-# Функция для автоматического поиска и импорта класса
+# Динамический поиск классов
 def get_class(class_name):
     for root, dirs, files in os.walk("."):
         for file in files:
@@ -24,34 +24,45 @@ if not TwitchChannelPointsMiner or not Streamer:
     print("❌ Не удалось найти необходимые классы!")
     sys.exit(1)
 
-# Читаем оба токена из окружения
+# Читаем токены из секретов GitHub
 token1 = os.environ.get("TWITCH_TOKEN_1", "")
 token2 = os.environ.get("TWITCH_TOKEN_2", "")
 
-# Берем первый доступный токен (или token1 по умолчанию)
+# Берем первый доступный токен
 auth_token = token1 or token2
 
 if not auth_token:
     print("❌ Ошибка: Ни один OAuth-токен (TWITCH_TOKEN_1 или TWITCH_TOKEN_2) не передан!")
     sys.exit(1)
 
-# Инициализация майнера
-miner = TwitchChannelPointsMiner(
-    username="Bot",
-    claim_drops_startup=True
-)
+# Если токен передан без приставки "oauth:", добавляем её при необходимости
+if not auth_token.startswith("oauth:") and len(auth_token) == 30:
+    auth_token = f"oauth:{auth_token}"
 
-# Передаем токен авторизации
-if hasattr(miner, "twitch") and miner.twitch is not None:
-    miner.twitch.auth_token = auth_token
+# Инициализация майнера (передаем oauth_token напрямую в параметры, если поддерживается, 
+# либо инициализируем чистый клиент)
+try:
+    miner = TwitchChannelPointsMiner(
+        username="Bot",
+        claim_drops_startup=True,
+        oauth_token=auth_token
+    )
+except TypeError:
+    # Запасной вариант инициализации, если аргумент oauth_token не принимается в __init__
+    miner = TwitchChannelPointsMiner(
+        username="Bot",
+        claim_drops_startup=True
+    )
+    if hasattr(miner, "oauth_token"):
+        miner.oauth_token = auth_token
 
-# Список стримеров
+# Список стримеров для фарма
 streamers = [
     Streamer("foxsi_pubg"),
     Streamer("tsunavohka")
 ]
 
-# Запуск
+# Запуск фарма
 miner.mine(
     streamers,
     followers=False,
