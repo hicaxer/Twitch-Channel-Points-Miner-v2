@@ -1,6 +1,14 @@
 import os
 import sys
+import builtins
 import importlib
+
+# Перехватываем вызовы input(), чтобы избежать EOFError в GitHub Actions
+def non_interactive_input(prompt=""):
+    print(f"[Auto-Input Blocking] Перехвачен запрос ввода: {prompt}")
+    raise KeyboardInterrupt("Консольный ввод недоступен в GitHub Actions (проверьте валидность OAuth-токена).")
+
+builtins.input = non_interactive_input
 
 # Функция для динамического поиска и импорта классов
 def get_class(class_name):
