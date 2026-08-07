@@ -2,7 +2,7 @@ import os
 import sys
 import importlib
 
-# Функция для автоматического поиска и импорта класса из любой подпапки
+# Функция для автоматического поиска и импорта класса
 def get_class(class_name):
     for root, dirs, files in os.walk("."):
         for file in files:
@@ -17,23 +17,22 @@ def get_class(class_name):
                     pass
     return None
 
-# Динамически находим нужные классы
 TwitchChannelPointsMiner = get_class("TwitchChannelPointsMiner")
 Streamer = get_class("Streamer")
 
-if not TwitchChannelPointsMiner:
-    print("❌ Не удалось найти класс TwitchChannelPointsMiner")
+if not TwitchChannelPointsMiner or not Streamer:
+    print("❌ Не удалось найти необходимые классы!")
     sys.exit(1)
 
-if not Streamer:
-    print("❌ Не удалось найти класс Streamer")
-    sys.exit(1)
+# Читаем оба токена из окружения
+token1 = os.environ.get("TWITCH_TOKEN_1", "")
+token2 = os.environ.get("TWITCH_TOKEN_2", "")
 
-# Получение OAuth-токена
-auth_token = os.environ.get("TWITCH_TOKEN", "")
+# Берем первый доступный токен (или token1 по умолчанию)
+auth_token = token1 or token2
 
 if not auth_token:
-    print("❌ Ошибка: OAuth-токен не передан!")
+    print("❌ Ошибка: Ни один OAuth-токен (TWITCH_TOKEN_1 или TWITCH_TOKEN_2) не передан!")
     sys.exit(1)
 
 # Инициализация майнера
