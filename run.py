@@ -1,7 +1,7 @@
 import os
 import sys
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.classes.Settings import Priority, StreamerSettings
+from TwitchChannelPointsMiner.classes.Settings import Priority
 from TwitchChannelPointsMiner.classes.Entities import Streamer
 
 # Берем токен из секретов GitHub Actions
@@ -11,7 +11,7 @@ if not auth_token:
     print("❌ Ошибка: OAuth-токен не передан!")
     sys.exit(1)
 
-# Инициализируем майнер (форк tkd-alex)
+# Инициализируем майнер
 miner = TwitchChannelPointsMiner(
     username="", 
     password="",
@@ -28,7 +28,7 @@ miner.analytics.auth_token = auth_token
 
 # Указываем отслеживаемые каналы
 streamers = [
-    Streamer("foxsi_pubg", settings=StreamerSettings(make_predictions=False)),
+    Streamer("foxsi_pubg"),
 ]
 
 # Запуск фарма
