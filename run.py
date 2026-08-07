@@ -1,7 +1,7 @@
 import os
 import sys
+import TwitchChannelPointsMiner
 from TwitchChannelPointsMiner import TwitchChannelPointsMiner
-from TwitchChannelPointsMiner.Settings import Priority
 from TwitchChannelPointsMiner.Streamer import Streamer
 
 # Берем токен из секретов GitHub Actions
@@ -15,12 +15,7 @@ if not auth_token:
 miner = TwitchChannelPointsMiner(
     username="", 
     password="",
-    claim_drops_startup=True,
-    priority=[
-        Priority.STREAK,
-        Priority.DROPS,
-        Priority.SUBSCRIBED
-    ]
+    claim_drops_startup=True
 )
 
 # Авторизация по OAuth-токену
