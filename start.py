@@ -71,13 +71,19 @@ for path in cookie_paths:
     except Exception:
         pass
 
-# 5. Инициализация майнера с отключенной аналитикой
+# 5. Инициализация майнера без лишних аргументов
 miner = TwitchChannelPointsMiner(
     username=username,
-    claim_drops_startup=True,
-    enable_analytics=False  # Отключает проблемные запросы к spade.twitch.tv
+    claim_drops_startup=True
 )
 
+# Отключаем аналитику через атрибуты, если они существуют в этой версии
+if hasattr(miner, "enable_analytics"):
+    miner.enable_analytics = False
+if hasattr(miner, "analytics") and hasattr(miner.analytics, "enable"):
+    miner.analytics.enable = False
+
+# Внедряем куки в сессию
 if hasattr(miner, "twitch") and hasattr(miner.twitch, "session"):
     miner.twitch.session.cookies.update(jar)
 
